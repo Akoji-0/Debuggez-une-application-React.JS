@@ -7,39 +7,27 @@ import "./style.scss";
 const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
-
-  const sortedEvents = data?.focus?.sort((eventA, eventB) =>
-    new Date(eventB.date) < new Date(eventA.date) ? -1 : 1
-  ) || [];
-
-  const goToNextCard = (newIndex = null) => {
-    if (newIndex !== null) {
-      setIndex(newIndex);
-    } else {
-      setIndex((prevIndex) =>
-        prevIndex < sortedEvents.length - 1 ? prevIndex + 1 : 0
-      );
-    }
+  const byDateDesc = data?.focus.sort((evtA, evtB) =>
+    // inversion <
+    new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
+  );
+  // affichage premiere image une fois a la derniere image sans afficher de page blanche
+  const nextCard = () => {
+    setTimeout(() => setIndex(index < byDateDesc?.length - 1 ? index + 1 : 0), 5000);
   };
-
   useEffect(() => {
-    const interval = setInterval(goToNextCard, 5000);
-
-    return () => clearInterval(interval);
-  }, [index, sortedEvents]);
-
-  const handleRadioChange = (newIndex) => {
-    goToNextCard(newIndex);
-  };
-
+    nextCard();
+  });
   return (
     <div className="SlideCardList">
-      {sortedEvents.map((event, idx) => (
+      {byDateDesc?.map((event, idx) => (
         <div
-          key={event.id || `event-${idx}`}  
-          className={`SlideCard SlideCard--${index === idx ? "display" : "hide"}`}
+          key={idx}
+          className={`SlideCard SlideCard--${
+            index === idx ? "display" : "hide"
+          }`}
         >
-          <img src={event.cover} alt={event.title} />
+          <img src={event.cover} alt="forum" />
           <div className="SlideCard__descriptionContainer">
             <div className="SlideCard__description">
               <h3>{event.title}</h3>
@@ -49,17 +37,18 @@ const Slider = () => {
           </div>
         </div>
       ))}
-
       <div className="SlideCard__paginationContainer">
         <div className="SlideCard__pagination">
-          {sortedEvents.map((event, radioIdx) => (
+          {byDateDesc?.map((event, radioIdx) => (
+            // {byDateDesc.map((_, radioIdx)
             <input
-              key={event.id || `pagination-${radioIdx}`} 
+              key={event.title}
+              // key={`${event.id}`} correction event n'a pas d'id
               type="radio"
               name="radio-button"
               checked={index === radioIdx}
-              onChange={() => handleRadioChange(radioIdx)}
-              aria-label={`Go to slide ${radioIdx + 1}`}
+              // checked={idx === radioIdx} correction idx => index
+              readOnly
             />
           ))}
         </div>
