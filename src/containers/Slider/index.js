@@ -13,16 +13,16 @@ const Slider = () => {
   );
   // affichage premiere image une fois a la derniere image sans afficher de page blanche
   const nextCard = () => {
-    setTimeout(() => setIndex(index < byDateDesc?.length - 1 ? index + 1 : 0), 5000);
+    setTimeout(() => setIndex(byDateDesc && index < byDateDesc.length - 1 ? index + 1 : 0), 5000);
   };
   useEffect(() => {
     nextCard();
-  });
+  }, [index]);
   return (
     <div className="SlideCardList">
       {byDateDesc?.map((event, idx) => (
         <div
-          key={idx}
+          key={event.id}
           className={`SlideCard SlideCard--${
             index === idx ? "display" : "hide"
           }`}
