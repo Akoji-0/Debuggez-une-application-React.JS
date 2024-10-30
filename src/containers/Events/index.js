@@ -11,38 +11,45 @@ const PER_PAGE = 9;
 
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState();
+  const [type, setType] = useState(null); // `null` signifie "toutes les catégories"
   const [currentPage, setCurrentPage] = useState(1);
-  const filteredEvents = (
-    (!type
-      ? data?.events
-      : data?.events) || []
-  ).filter((event, index) => {
-    if (
-      (currentPage - 1) * PER_PAGE <= index &&
-      PER_PAGE * currentPage > index
-    ) {
-      return true;
-    }
-    return false;
-  });
+
   const changeType = (evtType) => {
+    console.log("Changement de type :", evtType); // Vérifie la sélection du type
     setCurrentPage(1);
     setType(evtType);
   };
-  const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1;
-  const typeList = new Set(data?.events.map((event) => event.type));
+
+  // Filtrer les événements en fonction du type sélectionné
+  const filteredEvents = (
+    (!type
+      ? data?.events // Si `type` est null, inclure tous les événements
+      : data?.events.filter((event) => event.type === type)) || []
+  ).filter(
+    (_, index) =>
+      (currentPage - 1) * PER_PAGE <= index && PER_PAGE * currentPage > index
+  );
+
+  const pageNumber = Math.ceil(
+    ((!type
+      ? data?.events
+      : data?.events.filter((event) => event.type === type)
+    )?.length || 0) / PER_PAGE
+  );
+
+  const typeList = Array.from(new Set(data?.events.map((event) => event.type)));
+
   return (
     <>
-      {error && <div>An error occured</div>}
+      {error && <div>An error occurred</div>}
       {data === null ? (
         "loading"
       ) : (
         <>
           <h3 className="SelectTitle">Catégories</h3>
           <Select
-            selection={Array.from(typeList)}
-            onChange={(value) => (value ? changeType(value) : changeType(null))}
+            selection={typeList}
+            onChange={(value) => changeType(value || null)}
           />
           <div id="events" className="ListContainer">
             {filteredEvents.map((event) => (
@@ -60,9 +67,12 @@ const EventList = () => {
             ))}
           </div>
           <div className="Pagination">
-            {[...Array(pageNumber || 0)].map((_, n) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <a key={n} href="#events" onClick={() => setCurrentPage(n + 1)}>
+            {[...Array(pageNumber)].map((_, n) => (
+              <a
+                key={`page-${n + 1}`}
+                href="#events"
+                onClick={() => setCurrentPage(n + 1)}
+              >
                 {n + 1}
               </a>
             ))}
