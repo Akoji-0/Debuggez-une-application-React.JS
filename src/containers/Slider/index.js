@@ -17,7 +17,7 @@ const Slider = () => {
   };
   useEffect(() => {
     nextCard();
-  }, [index]);
+  });
   return (
     <div className="SlideCardList">
       {byDateDesc?.map((event, idx) => (
@@ -42,7 +42,7 @@ const Slider = () => {
           {byDateDesc?.map((event, radioIdx) => (
             // {byDateDesc.map((_, radioIdx)
             <input
-              key={event.title}
+              key={event.id}
               // key={`${event.id}`} correction event n'a pas d'id
               type="radio"
               name="radio-button"
